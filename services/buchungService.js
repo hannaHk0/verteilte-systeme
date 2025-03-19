@@ -1,4 +1,26 @@
-const db = require('./lowdb');
+import { Low } from 'lowdb';
+import { JSONFile } from 'lowdb/node';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+
+const file = new JSONFile(join(__dirname, '..', 'db.json'));
+const db = new Low(file, {defaultData: {buchung:[]}});
+
+
+async function initDB() {
+  await db.read();
+  // Falls noch keine Daten vorhanden sind, initialisiere das Datenmodell
+  db.data = db.data || { buchung: [] };
+  await db.write();
+}
+
+await initDB(); 
+
 
 async function createBuchung(buchungId, kursId, mitgliederId, buchungsdatum ) {
   await db.read();
@@ -13,4 +35,4 @@ async function getBuchung() {
   return db.data.buchung;
 }
 
-module.exports = { createBuchung, getBuchung };
+export { createBuchung, getBuchung };
