@@ -1,13 +1,5 @@
 {
+  "mitglied": [],
   "kurs": [],
-  "mitglied": [
-    {
-      "id": 1742415245368
-    }
-  ],
-  "buchung": [
-    {
-      "id": 1742415598937
-    }
-  ]
+  "buchungen": []
 }
