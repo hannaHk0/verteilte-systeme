@@ -12,7 +12,7 @@ tags:
     description: Alles zu den Kursen
   - name: Buchung
     description: Alles zu den Buchungen
-paths:
+path:
   /mitglied:
     post:
       tags:
@@ -48,6 +48,32 @@ paths:
       responses:
         '200':
           description: Erfolgreiche Antwort mit Mitgliedsdaten
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mitglied'
+        '404':
+          description: Mitglied nicht gefunden
+    path:
+      tags:
+        - Mitglied
+      summary: Mitglied aktualisieren
+      parameters:
+        - name: mitgliedId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID des zu aktualisierenden Mitglieds
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MitgliedUpdate'
+      responses:
+        '200':
+          description: Mitglied erfolgreich aktualisiert
           content:
             application/json:
               schema:
@@ -121,6 +147,32 @@ paths:
                 $ref: '#/components/schemas/Kurs'
         '404':
           description: Kurs nicht gefunden
+    path:
+      tags:
+        - Kurs
+      summary: Kurs aktualisieren
+      parameters:
+        - name: kursId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID des zu aktualisierenden Kurses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KursUpdate'
+      responses:
+        '200':
+          description: Kurs erfolgreich aktualisiert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kurs'
+        '404':
+          description: Kurs nicht gefunden
     delete:
       tags:
         - Kurs
@@ -153,177 +205,3 @@ paths:
         - Buchung
       summary: Neue Buchung erstellen
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BuchungCreate'
-      responses:
-        '201':
-          description: Buchung wurde erstellt
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Buchung'
-        '400':
-          description: Fehlerhafte Anfrage
-  /buchung/{buchungId}:
-    get:
-      tags:
-        - Buchung
-      summary: Einzelne Buchung abrufen
-      parameters:
-        - name: buchungId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID der Buchung
-      responses:
-        '200':
-          description: Erfolgreiche Antwort mit Buchungsdaten
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Buchung'
-        '404':
-          description: Buchung nicht gefunden
-    delete:
-      tags:
-        - Buchung
-      summary: Buchung löschen
-      parameters:
-        - name: buchungId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID der zu löschenden Buchung
-      responses:
-        '200':
-          description: Buchung erfolgreich gelöscht
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Buchung gelöscht"
-                  data:
-                    $ref: '#/components/schemas/Buchung'
-        '404':
-          description: Buchung nicht gefunden
-components:
-  schemas:
-    MitgliedCreate:
-      type: object
-      required:
-        - mitgliedId
-        - name
-      properties:
-        mitgliedId:
-          type: string
-          example: "M001"
-        name:
-          type: string
-          example: "Max Mustermann"
-        email:
-          type: string
-          example: "max@example.com"
-        telefonnummer:
-          type: string
-          example: "0123456789"
-    Mitglied:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 123456789
-        mitgliedId:
-          type: string
-          example: "M001"
-        name:
-          type: string
-          example: "Max Mustermann"
-        email:
-          type: string
-          example: "max@example.com"
-        telefonnummer:
-          type: string
-          example: "0123456789"
-    KursCreate:
-      type: object
-      required:
-        - kursId
-        - titel
-      properties:
-        kursId:
-          type: string
-          example: "K001"
-        titel:
-          type: string
-          example: "Yoga für Anfänger"
-        beschreibung:
-          type: string
-          example: "Ein Kurs für Yoga-Anfänger"
-        trainer:
-          type: string
-          example: "Anna Müller"
-    Kurs:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 987654321
-        kursId:
-          type: string
-          example: "K001"
-        titel:
-          type: string
-          example: "Yoga für Anfänger"
-        beschreibung:
-          type: string
-          example: "Ein Kurs für Yoga-Anfänger"
-        trainer:
-          type: string
-          example: "Anna Müller"
-    BuchungCreate:
-      type: object
-      required:
-        - buchungId
-        - kursId
-        - mitgliederId
-      properties:
-        buchungId:
-          type: string
-          example: "B001"
-        kursId:
-          type: string
-          example: "K001"
-        mitgliederId:
-          type: string
-          example: "M001"
-        buchungsdatum:
-          type: string
-          format: date-time
-          example: "2025-03-20T15:00:00.000Z"
-    Buchung:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1122334455
-        buchungId:
-          type: string
-          example: "B001"
-        kursId:
-          type: string
-          example: "K001"
-        mitgliederId:
-          type: string
-          example: "M001"
-        buchungsdatum:
-          type: string
-          format: date-time
-          example: "2025-03-20T15:00:00.000Z"

@@ -2,17 +2,17 @@ import { getDB } from '../lowdb.js';
 import { publishMessage } from '../mqtt/mqttPublisher.js';
 
 
-async function createBuchung(buchungId, mitgliedId, kursId, datum) {
+async function createBuchung(buchungId, mitgliederId, kursId, buchungsdatum) {
   const db = getDB();
   await db.read();
   
-
+  
   const buchung = { 
     id: Date.now(),
     buchungId, 
-    mitgliedId, 
+    mitgliederId, 
     kursId,
-    datum: datum || new Date().toISOString()
+    buchungsdatum: buchungsdatum || new Date().toISOString()
   };
   
   
@@ -43,7 +43,7 @@ async function getBuchung(buchungId) {
     throw new Error(`Buchung mit ID ${buchungId} nicht gefunden`);
   }
   
- 
+  
   const topic = `WWI23B3_Huber/Buchung`; 
   const message = JSON.stringify({
     event: 'buchungAbgerufen',
@@ -53,6 +53,40 @@ async function getBuchung(buchungId) {
   publishMessage(topic, message);
 
   return buchung;
+}
+
+
+async function updateBuchung(buchungId, updateData) {
+  const db = getDB();
+  await db.read();
+  
+  const index = db.data.buchungen.findIndex(b => String(b.buchungId) === String(buchungId));
+  
+  if (index === -1) {
+    throw new Error(`Buchung mit ID ${buchungId} nicht gefunden`);
+  }
+  
+
+  const updatedBuchung = {
+    ...db.data.buchungen[index],
+    ...updateData,
+    id: db.data.buchungen[index].id,               
+    buchungId: db.data.buchungen[index].buchungId  
+  };
+  
+  db.data.buchungen[index] = updatedBuchung;
+  await db.write();
+  
+  
+  const topic = `WWI23B3_Huber/Buchung`; 
+  const message = JSON.stringify({
+    event: 'buchungAktualisiert',
+    url: `/buchung/${buchungId}`,
+    data: updatedBuchung
+  });
+  publishMessage(topic, message);
+  
+  return updatedBuchung;
 }
 
 
@@ -66,11 +100,11 @@ async function deleteBuchung(buchungId) {
     throw new Error(`Buchung mit ID ${buchungId} nicht gefunden`);
   }
 
- 
+  
   const deletedBuchung = db.data.buchungen.splice(index, 1)[0];
   await db.write();
 
-  
+ 
   const topic = `WWI23B3_Huber/Buchung`; 
   const message = JSON.stringify({
     event: 'buchungGelöscht',
@@ -82,4 +116,4 @@ async function deleteBuchung(buchungId) {
   return deletedBuchung;
 }
 
-export { createBuchung, getBuchung, deleteBuchung };
+export { createBuchung, getBuchung, updateBuchung, deleteBuchung };

@@ -15,11 +15,10 @@ async function createMitglied(mitgliedId, name, email, telefonnummer) {
     telefonnummer
   };
   
- 
+  
   db.data.mitglied.push(mitglied);
   await db.write();
 
-  
   const topic = `WWI23B3_Huber/Mitglied`; 
   const message = JSON.stringify({
     event: 'mitgliedErstellt',
@@ -36,14 +35,12 @@ async function getMitglied(mitgliedId) {
   const db = getDB();
   await db.read();
   
- 
   const mitglied = db.data.mitglied.find(m => String(m.mitgliedId) === String(mitgliedId));
   
   if (!mitglied) {
     throw new Error(`Mitglied mit ID ${mitgliedId} nicht gefunden`);
   }
   
-
   const topic = `WWI23B3_Huber/Mitglied`; 
   const message = JSON.stringify({
     event: 'mitgliedAbgerufen',
@@ -53,6 +50,38 @@ async function getMitglied(mitgliedId) {
   publishMessage(topic, message);
 
   return mitglied;
+}
+
+
+async function updateMitglied(mitgliedId, updateData) {
+  const db = getDB();
+  await db.read();
+  
+  const index = db.data.mitglied.findIndex(m => String(m.mitgliedId) === String(mitgliedId));
+  
+  if (index === -1) {
+    throw new Error(`Mitglied mit ID ${mitgliedId} nicht gefunden`);
+  }
+  
+  const updatedMitglied = {
+    ...db.data.mitglied[index],
+    ...updateData,
+    id: db.data.mitglied[index].id,         
+    mitgliedId: db.data.mitglied[index].mitgliedId  
+  };
+  
+  db.data.mitglied[index] = updatedMitglied;
+  await db.write();
+  
+  const topic = `WWI23B3_Huber/Mitglied`; 
+  const message = JSON.stringify({
+    event: 'mitgliedAktualisiert',
+    url: `/mitglied/${mitgliedId}`,
+    data: updatedMitglied
+  });
+  publishMessage(topic, message);
+  
+  return updatedMitglied;
 }
 
 
@@ -66,7 +95,6 @@ async function deleteMitglied(mitgliedId) {
     throw new Error(`Mitglied mit ID ${mitgliedId} nicht gefunden`);
   }
 
-  
   const deletedMitglied = db.data.mitglied.splice(index, 1)[0];
   await db.write();
 
@@ -81,4 +109,4 @@ async function deleteMitglied(mitgliedId) {
   return deletedMitglied;
 }
 
-export { createMitglied, getMitglied, deleteMitglied };
+export { createMitglied, getMitglied, updateMitglied, deleteMitglied };

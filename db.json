@@ -1,5 +1,21 @@
 {
   "mitglied": [],
-  "kurs": [],
-  "buchungen": []
+  "kurs": [
+    {
+      "id": 1742564631503,
+      "kursId": "K001",
+      "titel": "Yoga für Fortgeschrittene",
+      "beschreibung": "Ein Kurs für Yoga-Anfänger",
+      "trainer": "Thomas Schmidt"
+    }
+  ],
+  "buchungen": [
+    {
+      "id": 1742547323444,
+      "buchungId": "B001",
+      "mitgliedId": "M001",
+      "kursId": "K001",
+      "datum": "2025-03-25T18:00:00.000Z"
+    }
+  ]
 }
